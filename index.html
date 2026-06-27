@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Serenity Care Hospital — Management</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{
+      --nav-blue:#133B8E;
+      --nav-blue-2:#1E40AF;
+      --accent:#2563eb;
+      --muted:#6b7280;
+      --card:#ffffff;
+      --bg1: linear-gradient(135deg,#eff6ff 0%, #e0f2fe 100%);
+      --shadow: 0 6px 18px rgba(17,24,39,0.08);
+      --radius:12px;
+      --gap:14px;
+      --maxwidth:1100px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: var(--bg1);
+      color:#0f172a;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.4;
+    }
+
+    /* Page container */
+    .site {
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+    header.topbar{
+      background: linear-gradient(90deg,var(--nav-blue) 0%, var(--nav-blue-2) 100%);
+      color:white;
+      padding:16px 20px;
+      box-shadow: var(--shadow);
+    }
+    .topbar-inner{
+      max-width:var(--maxwidth);
+      margin:0 auto;
+      display:flex;
+      gap:var(--gap);
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+
+    /* left logo */
+    .brand{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .logo {
+      width:56px;
+      height:56px;
+      background:white;
+      border-radius:10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 4px 12px rgba(0,0,0,0.08);
+      flex-shrink:0;
+    }
+    .logo svg { width:36px; height:36px; }
+    .brand h1{
+      font-size:18px;
+      margin:0;
+      font-weight:700;
+      letter-spacing:0.2px;
+    }
+    .brand p { margin:0; font-size:12px; opacity:0.9}
+
+    /* right area: search + nav (nav below search) */
+    .right-col{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:12px;
+      min-width:280px;
+    }
+
+    /* search */
+    .search-wrap{
+      position:relative;
+      width:320px;
+      max-width:40vw;
+    }
+    .search-input{
+      width:100%;
+      padding:10px 12px 10px 36px;
+      border-radius:10px;
+      border:none;
+      outline:none;
+      font-size:14px;
+      background:rgba(255,255,255,0.95);
+      color:#0f172a;
+      box-shadow:0 3px 8px rgba(2,6,23,0.12);
+    }
+    .search-icon{
+      position:absolute;
+      left:10px;
+      top:50%;
+      transform:translateY(-50%);
+      color:var(--muted);
+      opacity:0.95;
+      pointer-events:none;
+    }
+
+    /* global dropdown */
+    .search-dropdown{
+      position:absolute;
+      right:0;
+      top:46px;
+      width:100%;
+      background:var(--card);
+      border-radius:10px;
+      box-shadow:0 10px 30px rgba(2,6,23,0.12);
+      overflow:hidden;
+      max-height:320px;
+      z-index:120;
+      border:1px solid rgba(2,6,23,0.06);
+    }
+    .search-item{
+      padding:10px 12px;
+      font-size:14px;
+      color:#0f172a;
+      border-bottom:1px solid rgba(15,23,42,0.04);
+      cursor:pointer;
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+    .search-item:hover{
+      background:linear-gradient(90deg, rgba(37,99,235,0.08), rgba(37,99,235,0.04));
+    }
+    .search-item small{ color:var(--muted); font-size:12px }
+
+    /* nav row right */
+    .nav-row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-self:end;
+    }
+    .nav-btn{
+      background:transparent;
+      color:white;
+      padding:8px 12px;
+      border-radius:8px;
+      border:1px solid transparent;
+      cursor:pointer;
+      font-weight:600;
+      font-size:14px;
+      transition:all .18s ease;
+    }
+    .nav-btn:hover{ background:rgba(255,255,255,0.06) }
+    .nav-btn.active{ background:white; color:var(--nav-blue-2); box-shadow:0 6px 18px rgba(2,6,23,0.08) }
+
+    /* Main content area */
+    main.content{
+      max-width:var(--maxwidth);
+      margin:20px auto;
+      width:100%;
+      padding:12px 20px 80px 20px;
+      flex:1;
+    }
+    .page{
+      display:block;
+    }
+    .hidden{ display:none; }
+
+    /* cards and table */
+    .card{
+      background:var(--card);
+      border-radius:12px;
+      padding:18px;
+      box-shadow:var(--shadow);
+    }
+    .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    h2 { font-size:20px; margin:0 0 10px 0; color:var(--nav-blue-2); }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      border-radius:12px;
+      overflow:hidden;
+    }
+    thead th{
+      text-align:left;
+      padding:12px;
+      background:linear-gradient(180deg,#e6f0ff, #dbeeff);
+      font-weight:700;
+      color:var(--nav-blue-2);
+      font-size:14px;
+    }
+    tbody td{
+      padding:12px;
+      border-bottom:1px solid rgba(15,23,42,0.06);
+      font-size:14px;
+    }
+    tbody tr:hover{ background:linear-gradient(90deg, rgba(37,99,235,0.03), rgba(37,99,235,0.01)); cursor:pointer; }
+
+    .controls{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      margin-bottom:12px;
+    }
+    .select{
+      padding:8px 10px;
+      border-radius:8px;
+      border:1px solid rgba(2,6,23,0.06);
+      background:white;
+      font-size:14px;
+    }
+
+    /* form */
+    form .form-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    input[type="text"], input[type="number"], textarea{ padding:10px; border-radius:8px; border:1px solid rgba(2,6,23,0.06); width:100%; font-size:14px }
+    textarea{ min-height:90px; resize:vertical }
+    .btn{
+      background:var(--accent);
+      color:white;
+      padding:10px 14px;
+      border-radius:8px;
+      border:none;
+      font-weight:700;
+      cursor:pointer;
+      box-shadow:0 6px 12px rgba(37,99,235,0.12);
+    }
+    .muted{ color:var(--muted); font-size:13px }
+
+    /* illustrative svg container */
+    .illustration { margin-top:18px; display:flex; justify-content:center; }
+
+    /* responsive */
+    @media (max-width:900px){
+      .right-col{ width:100%; align-items:stretch; }
+      .topbar-inner{ align-items:center; }
+      .nav-row{ justify-content:center; width:100%; }
+      .search-wrap{ width:100%; max-width:100%; }
+      .grid-2{ grid-template-columns:1fr; }
+      .search-dropdown{ left:0; right:0; width:100% }
+    }
+  </style>
+</head>
+<body>
+  <div class="site">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <!-- left: logo + name -->
+        <div class="brand">
+          <div class="logo" aria-hidden>
+            <!-- hospital cross + building icon (SVG) -->
+            <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="none">
+              <rect x="6" y="18" width="52" height="36" rx="6" fill="#E6EEF8"/>
+              <rect x="16" y="26" width="12" height="8" rx="1.5" fill="#1E40AF"/>
+              <rect x="36" y="26" width="12" height="8" rx="1.5" fill="#1E40AF"/>
+              <rect x="28" y="8" width="8" height="18" rx="2" fill="#2563EB"/>
+              <path d="M32 18v6m-3-3h6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div>
+            <h1>Serenity Care Hospital</h1>
+            <p class="muted">Compassionate care • 24/7 • Multi-speciality</p>
+          </div>
+        </div>
+
+        <!-- right: search + nav below -->
+        <div class="right-col">
+          <div style="display:flex; gap:12px; align-items:center; width:100%; justify-content:flex-end;">
+            <div class="search-wrap" title="Search patients">
+              <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 20l-4.35-4.35A7.92 7.92 0 0016 9a8 8 0 10-8 8 7.92 7.92 0 006.65-3.35L20 21l1-1zM4 9a5 5 0 115 5 5 5 0 01-5-5z"/></svg>
+              <input id="globalSearch" class="search-input" placeholder="Search patients (name, condition, doctor, room, phone...)" aria-label="Search patients">
+              <div id="globalDropdown" class="search-dropdown hidden" role="listbox" aria-label="Search suggestions"></div>
+            </div>
+          </div>
+
+          <div class="nav-row" role="navigation" aria-label="Main navigation">
+            <button class="nav-btn active" data-page="home">Home</button>
+            <button class="nav-btn" data-page="status">Patient Status</button>
+            <button class="nav-btn" data-page="info">Patient Info</button>
+            <button class="nav-btn" data-page="add">Add Patient</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="content" role="main">
+      <!-- HOME -->
+      <section id="page-home" class="page card">
+        <h2>Welcome to Serenity Care Hospital</h2>
+        <p class="muted">We combine compassionate care with modern medicine. Our hospital offers outpatient and inpatient services, emergency care, diagnostics, and specialist consultations. We prioritise patient safety, dignity, and evidence-based practice.</p>
+
+        <div style="margin-top:12px; display:grid; grid-template-columns:1fr 320px; gap:16px;">
+          <div>
+            <div class="card" style="padding:14px; margin-bottom:12px;">
+              <h3 style="margin:0 0 8px 0; color:var(--nav-blue-2)">Our Vision</h3>
+              <p class="muted" style="margin:0;">To be a centre of excellence delivering humane, accessible, and high-quality healthcare for all communities.</p>
+            </div>
+
+            <div class="card" style="padding:14px;">
+              <h3 style="margin:0 0 8px 0; color:var(--nav-blue-2)">Services & Departments</h3>
+              <ul class="muted" style="margin:0 0 0 16px; padding:0;">
+                <li>Emergency & Trauma</li>
+                <li>Internal Medicine & Cardiology</li>
+                <li>Orthopedics & Surgery</li>
+                <li>Pediatrics & Obstetrics</li>
+                <li>Radiology & Pathology</li>
+                <li>Rehabilitation & Physiotherapy</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card" style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <!-- Dashboard Illustration -->
+            <div class="illustration" aria-hidden>
+              <svg width="300" height="180" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+                <rect width="400" height="300" rx="16" fill="#EFF6FF"/>
+                <rect x="28" y="64" width="80" height="56" rx="8" fill="#1E40AF" opacity="0.12"/>
+                <rect x="124" y="52" width="236" height="72" rx="10" fill="#fff"/>
+                <circle cx="220" cy="96" r="28" fill="#60A5FA"/>
+                <path d="M80 200 C120 140, 200 140, 260 200 S360 260, 360 200" stroke="#2563eb" stroke-width="3" fill="none"/>
+                <text x="140" y="270" fill="#0f172a" font-size="14">Hospital Dashboard</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STATUS -->
+      <section id="page-status" class="page hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px;">
+          <div>
+            <h2>Patient Status Overview</h2>
+            <p class="muted" style="margin:6px 0 0 0;">Live patient list — click a row to open patient details.</p>
+          </div>
+          <div class="controls">
+            <label class="muted" for="sortSelect">Sort by</label>
+            <select id="sortSelect" class="select" aria-label="Sort patients">
+              <option value="">— None —</option>
+              <option value="name">Name (A → Z)</option>
+              <option value="age">Age (Ascending)</option>
+              <option value="condition">Condition (A → Z)</option>
+              <option value="room">Room (Numeric)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="overflow:auto;">
+            <table id="patientsTable" aria-live="polite">
+              <thead>
+                <tr>
+                  <th>ID</th><th>Name</th><th>Age</th><th>Condition</th><th>Doctor</th><th>Room</th><th>Status</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- INFO -->
+      <section id="page-info" class="page hidden card">
+        <h2>Patient Information</h2>
+        <div style="display:grid; grid-template-columns:1fr 320px; gap:16px;">
+          <div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+              <div><strong>Name</strong><div id="info-name" class="muted"></div></div>
+              <div><strong>Age</strong><div id="info-age" class="muted"></div></div>
+              <div><strong>Status</strong><div id="info-status" class="muted"></div></div>
+              <div><strong>Condition</strong><div id="info-condition" class="muted"></div></div>
+              <div><strong>Doctor</strong><div id="info-doctor" class="muted"></div></div>
+              <div><strong>Room</strong><div id="info-room" class="muted"></div></div>
+            </div>
+
+            <div style="margin-top:12px;">
+              <strong>Contact</strong>
+              <div id="info-phone" class="muted" style="margin-top:6px"></div>
+              <div id="info-address" class="muted" style="margin-top:6px"></div>
+            </div>
+
+            <div style="margin-top:12px;">
+              <strong>Previous Medical History</strong>
+              <div id="info-history" class="muted" style="margin-top:6px; white-space:pre-wrap"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card" style="padding:16px; display:flex; flex-direction:column; gap:10px; align-items:center; justify-content:center;">
+              <svg width="220" height="160" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+                <rect width="400" height="300" rx="16" fill="#DBEAFE"/>
+                <circle cx="200" cy="100" r="28" fill="#2563eb"/>
+                <path d="M120 180 Q200 100, 280 180" stroke="#1d4ed8" stroke-width="3" fill="none"/>
+                <text x="100" y="260" fill="#0f172a" font-size="13">Patient Health Summary</text>
+              </svg>
+              <div class="muted" style="text-align:center">Use the table to view more detailed patient records, update or discharge patients in future versions.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ADD -->
+      <section id="page-add" class="page hidden card">
+        <h2>Add New Patient</h2>
+        <p class="muted" style="margin-top:6px">Fill in patient details below. All data is stored locally in your browser.</p>
+
+        <form id="formAdd" style="margin-top:12px;">
+          <div class="form-grid">
+            <input id="fld-name" type="text" placeholder="Full name" required />
+            <input id="fld-age" type="number" placeholder="Age" required />
+            <input id="fld-condition" type="text" placeholder="Condition / Diagnosis" required />
+            <input id="fld-doctor" type="text" placeholder="Doctor assigned" required />
+            <input id="fld-room" type="text" placeholder="Room number" required />
+            <input id="fld-status" type="text" placeholder="Status (Admitted / Discharged / Observation)" required />
+          </div>
+
+          <div style="margin-top:12px;">
+            <input id="fld-phone" type="text" placeholder="Phone number" />
+          </div>
+          <div style="margin-top:12px;">
+            <input id="fld-address" type="text" placeholder="Address (street, city, state)" />
+          </div>
+          <div style="margin-top:12px;">
+            <textarea id="fld-history" placeholder="Previous medical history (allergies, chronic conditions, surgeries)"></textarea>
+          </div>
+
+          <div style="margin-top:12px; display:flex; gap:12px; align-items:center;">
+            <button class="btn" type="submit">Add Patient</button>
+            <div class="muted">Entries saved locally to this browser.</div>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <footer style="background:linear-gradient(90deg,#1e3a8a,#122859); color:white; padding:14px 0; text-align:center;">
+      <div style="max-width:var(--maxwidth); margin:0 auto;">© 2025 SerenityCare Hospital — Confidential patient records (local demo)</div>
+    </footer>
+  </div>
+
+  <script>
+    /***********************
+     * Data initialization
+     ***********************/
+    // Pre-populated sample dataset (20 records)
+    const SAMPLE_PATIENTS = [
+      { id:1, name:'John Smith', age:45, status:'Admitted', condition:'Pneumonia', doctor:'Dr. A Sharma', room:'101', phone:'+91-987650001', address:'12 Rose St, Newcity', history:'None' },
+      { id:2, name:'Aarav Patel', age:32, status:'Discharged', condition:'Migraine', doctor:'Dr. R Mehta', room:'102', phone:'+91-987650002', address:'34 Green Ave, Midtown', history:'Occasional migraines' },
+      { id:3, name:'Priya Verma', age:28, status:'Under Observation', condition:'Asthma', doctor:'Dr. K Iyer', room:'103', phone:'+91-987650003', address:'78 Lake Rd, Oldtown', history:'Childhood asthma' },
+      { id:4, name:'Emily Johnson', age:60, status:'Admitted', condition:'Diabetes', doctor:'Dr. S Rao', room:'104', phone:'+91-987650004', address:'22 Hill Park, Uptown', history:'Type II diabetes for 10 yrs' },
+      { id:5, name:'Michael Brown', age:50, status:'Admitted', condition:'Hypertension', doctor:'Dr. P Singh', room:'105', phone:'+91-987650005', address:'9 River Blvd, Westside', history:'Hypertension' },
+      { id:6, name:'Sophia Williams', age:35, status:'Discharged', condition:'Fracture', doctor:'Dr. V Malhotra', room:'106', phone:'+91-987650006', address:'17 Oak Lane, Midtown', history:'Leg fracture surgery' },
+      { id:7, name:'Liam Davis', age:40, status:'Under Observation', condition:'Heart Disease', doctor:'Dr. K Iyer', room:'107', phone:'+91-987650007', address:'4 Pine St, Oldtown', history:'Coronary artery disease' },
+      { id:8, name:'Isabella Martinez', age:29, status:'Admitted', condition:'Appendicitis', doctor:'Dr. R Mehta', room:'108', phone:'+91-987650008', address:'100 Main St, Downtown', history:'N/A' },
+      { id:9, name:'Ethan Wilson', age:55, status:'Discharged', condition:'Stroke', doctor:'Dr. A Sharma', room:'109', phone:'+91-987650009', address:'56 River Rd, Eastside', history:'Ischemic stroke' },
+      { id:10, name:'Olivia Taylor', age:38, status:'Admitted', condition:'Infection', doctor:'Dr. S Rao', room:'110', phone:'+91-987650010', address:'88 Walnut St, Westend', history:'Recent UTI' },
+      { id:11, name:'Noah Anderson', age:42, status:'Under Observation', condition:'Asthma', doctor:'Dr. P Singh', room:'111', phone:'+91-987650011', address:'12 Maple Ave, Midtown', history:'Mild asthma' },
+      { id:12, name:'Ava Thomas', age:31, status:'Discharged', condition:'Migraine', doctor:'Dr. V Malhotra', room:'112', phone:'+91-987650012', address:'19 Cedar Ln, Uptown', history:'Chronic migraines' },
+      { id:13, name:'William Jackson', age:47, status:'Admitted', condition:'Pneumonia', doctor:'Dr. K Iyer', room:'113', phone:'+91-987650013', address:'3 Birch Rd, Oldtown', history:'Smoker' },
+      { id:14, name:'Mia White', age:27, status:'Admitted', condition:'Surgery Recovery', doctor:'Dr. R Mehta', room:'114', phone:'+91-987650014', address:'23 Cherry St, Downtown', history:'Appendectomy' },
+      { id:15, name:'James Harris', age:52, status:'Discharged', condition:'Diabetes', doctor:'Dr. A Sharma', room:'115', phone:'+91-987650015', address:'67 Park Ave, Eastside', history:'On insulin' },
+      { id:16, name:'Charlotte Lewis', age:36, status:'Under Observation', condition:'Hypertension', doctor:'Dr. S Rao', room:'116', phone:'+91-987650016', address:'11 Sunset Blvd, Westend', history:'High BP' },
+      { id:17, name:'Benjamin Clark', age:49, status:'Admitted', condition:'Fracture', doctor:'Dr. P Singh', room:'117', phone:'+91-987650017', address:'41 Spruce St, Midtown', history:'Knee fracture' },
+      { id:18, name:'Harper Robinson', age:33, status:'Discharged', condition:'Infection', doctor:'Dr. V Malhotra', room:'118', phone:'+91-987650018', address:'8 Elm Rd, Uptown', history:'Skin infection' },
+      { id:19, name:'Alexander Walker', age:41, status:'Admitted', condition:'Heart Disease', doctor:'Dr. K Iyer', room:'119', phone:'+91-987650019', address:'2 Oakwood Ln, Downtown', history:'Angina' },
+      { id:20, name:'Evelyn Hall', age:30, status:'Under Observation', condition:'Appendicitis', doctor:'Dr. R Mehta', room:'120', phone:'+91-987650020', address:'90 River St, Eastside', history:'N/A' }
+    ];
+
+    // load patients from localStorage or use sample
+    let patients = (() => {
+      try {
+        const raw = localStorage.getItem('patients_v2');
+        if(raw) return JSON.parse(raw);
+      } catch(e){ /* ignore parse error */ }
+      return SAMPLE_PATIENTS.slice();
+    })();
+
+    // current selected patient (for info)
+    let currentPatient = patients[0] || null;
+
+    /***********************
+     * Helpers & rendering
+     ***********************/
+    const q = sel => document.querySelector(sel);
+    const qAll = sel => Array.from(document.querySelectorAll(sel));
+
+    function savePatients(){
+      localStorage.setItem('patients_v2', JSON.stringify(patients));
+    }
+
+    function formatPreview(p){
+      return `${p.name} — ${p.condition} | ${p.doctor} | Room ${p.room}`;
+    }
+
+    /* Nav handling */
+    const navButtons = qAll('.nav-btn');
+    navButtons.forEach(btn => btn.addEventListener('click', () => {
+      const page = btn.getAttribute('data-page');
+      goToPage(page);
+    }));
+
+    function setActiveNav(page){
+      navButtons.forEach(b => b.classList.toggle('active', b.getAttribute('data-page') === page));
+    }
+
+    function goToPage(page){
+      // hide all pages
+      qAll('main .page').forEach(p => p.classList.add('hidden'));
+      // show page
+      const el = q('#page-' + page);
+      if(el) el.classList.remove('hidden');
+      setActiveNav(page);
+      if(page === 'status') renderTable();
+      if(page === 'info') renderPatientInfo(currentPatient);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* Render table */
+    const patientsTableBody = q('#patientsTable tbody');
+    function renderTable(sortKey = '') {
+      // copy patients
+      let list = patients.slice();
+
+      // apply sort if provided
+      if(sortKey){
+        if(sortKey === 'name' || sortKey === 'condition' || sortKey === 'doctor' || sortKey === 'status'){
+          list.sort((a,b) => a[sortKey].toString().toLowerCase().localeCompare(b[sortKey].toString().toLowerCase()));
+        } else if(sortKey === 'age' || sortKey === 'room'){
+          // numeric sort (room may be numeric or string)
+          list.sort((a,b) => {
+            const A = Number(a[sortKey]) || 0;
+            const B = Number(b[sortKey]) || 0;
+            return A - B;
+          });
+        }
+      }
+
+      patientsTableBody.innerHTML = '';
+      list.forEach(p => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${p.id}</td>
+          <td>${escapeHtml(p.name)}</td>
+          <td>${escapeHtml(p.age)}</td>
+          <td>${escapeHtml(p.condition)}</td>
+          <td>${escapeHtml(p.doctor)}</td>
+          <td>${escapeHtml(p.room)}</td>
+          <td>${escapeHtml(p.status)}</td>
+        `;
+        tr.addEventListener('click', () => {
+          currentPatient = p;
+          goToPage('info');
+        });
+        patientsTableBody.appendChild(tr);
+      });
+    }
+
+    function renderPatientInfo(p){
+      if(!p){
+        q('#info-name').textContent = '—';
+        q('#info-age').textContent = '—';
+        q('#info-status').textContent = '—';
+        q('#info-condition').textContent = '—';
+        q('#info-doctor').textContent = '—';
+        q('#info-room').textContent = '—';
+        q('#info-phone').textContent = '';
+        q('#info-address').textContent = '';
+        q('#info-history').textContent = '';
+        return;
+      }
+      q('#info-name').textContent = p.name;
+      q('#info-age').textContent = p.age;
+      q('#info-status').textContent = p.status;
+      q('#info-condition').textContent = p.condition;
+      q('#info-doctor').textContent = p.doctor;
+      q('#info-room').textContent = p.room;
+      q('#info-phone').textContent = 'Phone: ' + (p.phone || 'N/A');
+      q('#info-address').textContent = 'Address: ' + (p.address || 'N/A');
+      q('#info-history').textContent = (p.history && p.history.trim()) ? p.history : 'No previous history recorded.';
+    }
+
+    function escapeHtml(s){
+      if(typeof s !== 'string') return s;
+      return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    /***********************
+     * Add patient form
+     ***********************/
+    const addForm = q('#formAdd');
+    addForm.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const newP = {
+        id: (patients.length ? Math.max(...patients.map(p=>p.id)) : 0) + 1,
+        name: q('#fld-name').value.trim(),
+        age: q('#fld-age').value.trim(),
+        condition: q('#fld-condition').value.trim(),
+        doctor: q('#fld-doctor').value.trim(),
+        room: q('#fld-room').value.trim(),
+        status: q('#fld-status').value.trim(),
+        phone: q('#fld-phone').value.trim(),
+        address: q('#fld-address').value.trim(),
+        history: q('#fld-history').value.trim()
+      };
+      patients.push(newP);
+      savePatients();
+      // reset
+      addForm.reset();
+      // show status with new table
+      renderTable();
+      currentPatient = newP;
+      goToPage('status');
+    });
+
+    /***********************
+     * Search (global) — live with dropdown
+     ***********************/
+    const globalSearch = q('#globalSearch');
+    const globalDropdown = q('#globalDropdown');
+
+    function showSearchResults(list){
+      globalDropdown.innerHTML = '';
+      if(!list || list.length === 0){
+        globalDropdown.classList.add('hidden');
+        return;
+      }
+      list.slice(0,30).forEach(p=>{
+        const div = document.createElement('div');
+        div.className = 'search-item';
+        div.innerHTML = `<strong>${escapeHtml(p.name)}</strong><small style="margin-left:auto">${escapeHtml(p.room)}</small><div style="width:100%; font-size:13px; color:var(--muted)">${escapeHtml(p.condition)} • ${escapeHtml(p.doctor)}</div>`;
+        div.addEventListener('click', ()=>{
+          currentPatient = p;
+          renderPatientInfo(p);
+          globalDropdown.classList.add('hidden');
+          globalSearch.value = '';
+          goToPage('info');
+        });
+        globalDropdown.appendChild(div);
+      });
+      globalDropdown.classList.remove('hidden');
+    }
+
+    globalSearch.addEventListener('input', function(){
+      const qv = this.value.trim().toLowerCase();
+      if(!qv){ globalDropdown.classList.add('hidden'); return; }
+      const found = patients.filter(p=>{
+        return (p.name && p.name.toLowerCase().includes(qv)) ||
+               (p.condition && p.condition.toLowerCase().includes(qv)) ||
+               (p.doctor && p.doctor.toLowerCase().includes(qv)) ||
+               (p.room && p.room.toString().toLowerCase().includes(qv)) ||
+               (p.phone && p.phone.toLowerCase().includes(qv)) ||
+               (p.address && p.address.toLowerCase().includes(qv)) ||
+               (p.history && p.history.toLowerCase().includes(qv));
+      });
+      showSearchResults(found);
+    });
+
+    // hide dropdown when clicking outside
+    document.addEventListener('click', (e)=>{
+      if(!e.target.closest('.search-wrap') && !e.target.closest('.search-dropdown')) {
+        globalDropdown.classList.add('hidden');
+      }
+    });
+
+    /***********************
+     * Sort (on status)
+     ***********************/
+    const sortSelect = q('#sortSelect');
+    sortSelect.addEventListener('change', function(){
+      const key = this.value;
+      renderTable(key);
+    });
+
+    /***********************
+     * Initialization
+     ***********************/
+    // render initial table & info
+    renderTable();
+    renderPatientInfo(currentPatient);
+
+    // set initial page
+    goToPage('home');
+
+    // expose for debugging (optional)
+    window.__patients = patients;
+    window.__save = savePatients;
+  </script>
+</body>
+</html>
